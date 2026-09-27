@@ -11,7 +11,7 @@ function createOverlay() {
   overlay.webContents.once('did-finish-load', sendConfig);
 }
 function createPanel() {
-  panel = new BrowserWindow({ width: 1120, height: 760, minWidth: 900, minHeight: 650, title: 'Aimxity', backgroundColor: '#0a0c11', webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false } });
+  panel = new BrowserWindow({ width: 1120, height: 760, minWidth: 900, minHeight: 650, title: 'Aimxity', backgroundColor: '#0a0c11', autoHideMenuBar: true, webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false } });
   if (app.isPackaged) panel.loadFile(path.join(__dirname, '../dist/index.html')); else panel.loadURL('http://localhost:5173');
 }
 function registerKeys() {
