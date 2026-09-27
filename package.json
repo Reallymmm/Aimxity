@@ -1,0 +1,11 @@
+{
+  "name": "aimxity",
+  "version": "1.0.0",
+  "description": "Настраиваемый игровой оверлей прицела для Windows",
+  "main": "electron/main.cjs",
+  "author": "Aimxity",
+  "license": "MIT",
+  "scripts": {"dev": "vite --host 0.0.0.0", "build": "vite build", "desktop": "electron .", "dist:win": "npm run build && electron-builder --win nsis"},
+  "devDependencies": {"electron":"^31.7.7","electron-builder":"^24.13.3","vite":"^5.4.14"},
+  "build": {"appId":"com.aimxity.overlay","productName":"Aimxity","files":["dist/**/*","electron/**/*","package.json"],"directories":{"buildResources":"build","output":"release"},"win":{"target":["nsis"],"artifactName":"Aimxity-Setup-${version}.${ext}"},"nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true}}
+}
