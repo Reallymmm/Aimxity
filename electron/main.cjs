@@ -13,6 +13,12 @@ function createOverlay() {
 function createPanel() {
   panel = new BrowserWindow({ width: 1120, height: 760, minWidth: 900, minHeight: 650, title: 'Aimxity', backgroundColor: '#0a0c11', autoHideMenuBar: true, webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false } });
   if (app.isPackaged) panel.loadFile(path.join(__dirname, '../dist/index.html')); else panel.loadURL('http://localhost:5173');
+  // The transparent overlay is a separate window; close it too when the user exits,
+  // otherwise the process remains alive and blocks upgrades/uninstallers.
+  panel.on('closed', () => {
+    if (overlay && !overlay.isDestroyed()) overlay.destroy();
+    app.quit();
+  });
 }
 function registerKeys() {
   const binds = { 'CommandOrControl+Shift+X': () => { config.visible = !config.visible; sendConfig(); if(panel) panel.webContents.send('crosshair:state', config.visible); }, 'CommandOrControl+Shift+H': () => { config.visible = false; sendConfig(); if(panel) panel.webContents.send('crosshair:state', false); }, 'CommandOrControl+Shift+Plus': () => { config.size = Math.min(80, config.size + 2); sendConfig(); if(panel) panel.webContents.send('crosshair:config', config); } };
