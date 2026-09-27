@@ -1,18 +1,22 @@
 import './overlay.css';
 const root = document.querySelector('#crosshair');
 let lastConfig;
-function position(c=lastConfig) { if(!c)return;const dpr=window.devicePixelRatio||1;const physicalThickness=(Number(c.thickness)||1)*dpr;const snap=n=>(Math.round(n*dpr-physicalThickness/2)+physicalThickness/2)/dpr;root.style.left=`${snap(window.innerWidth/2+(Number(c.offsetX)||0))}px`;root.style.top=`${snap(window.innerHeight/2+(Number(c.offsetY)||0))}px`; }
+function position(c=lastConfig) { if(!c)return;const dpr=window.devicePixelRatio||1;const stroke=(Number(c.thickness)||1)*(Number(c.size)||30)/30;const physicalThickness=stroke*dpr;const snap=n=>(Math.round(n*dpr-physicalThickness/2)+physicalThickness/2)/dpr;root.style.left=`${snap(window.innerWidth/2+(Number(c.offsetX)||0))}px`;root.style.top=`${snap(window.innerHeight/2+(Number(c.offsetY)||0))}px`; }
 window.addEventListener('resize',()=>position());
 function render(c) {
   lastConfig=c;
   root.replaceChildren();
   root.style.display = c.visible ? 'block' : 'none';
-  for (const [name, value] of Object.entries({color:c.color,alpha:Math.max(0,Math.min(100,Number(c.opacity)||0))/100,size:`${c.size}px`,length:`${c.length}px`,thickness:`${c.thickness}px`,gap:`${c.gap}px`,'offset-x':`${c.offsetX||0}px`,'offset-y':`${c.offsetY||0}px`})) root.style.setProperty(`--${name}`, value);
+  const scale=(Number(c.size)||0)/30;for (const [name, value] of Object.entries({color:c.color,alpha:Math.max(0,Math.min(100,Number(c.opacity)||0))/100,size:`${c.size}px`,length:`${Number(c.length)*scale}px`,thickness:`${Number(c.thickness)*scale}px`,gap:`${Number(c.gap)*scale}px`,'offset-x':`${c.offsetX||0}px`,'offset-y':`${c.offsetY||0}px`})) root.style.setProperty(`--${name}`, value);
   root.className = `crosshair shape-${c.shape} ${c.outline ? 'outlined' : ''}`;
   const add = (className) => { const el = document.createElement('i'); el.className = className; root.append(el); };
   if (c.shape === 'dot') add('center-dot');
   else if (c.shape === 'circle') { add('ring'); if (c.dot) add('center-dot'); }
   else if (c.shape === 'cross') { add('diagonal d1'); add('diagonal d2'); if (c.dot) add('center-dot'); }
+  else if (c.shape === 'plus') { add('solid-h'); add('solid-v'); }
+  else if (c.shape === 'square') add('square');
+  else if (c.shape === 'corners') for (const corner of ['tl-h','tl-v','tr-h','tr-v','bl-h','bl-v','br-h','br-v']) add(`corner ${corner}`);
+  else if (c.shape === 'chevron') { add('chevron left'); add('chevron right'); }
   else { for (const side of ['top','right','bottom','left']) add(`arm a-${side}`); if (c.dot) add('center-dot'); }
   position(c);
 }
