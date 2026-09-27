@@ -1,12 +1,15 @@
 import './overlay.css';
 const root = document.querySelector('#crosshair');
 function render(c) {
-  root.replaceChildren(); root.style.display = c.visible ? 'block' : 'none';
-  root.style.setProperty('--color', c.color); root.style.setProperty('--alpha', c.opacity / 100); root.style.setProperty('--size', `${c.size}px`); root.style.setProperty('--thickness', `${c.thickness}px`); root.style.setProperty('--gap', `${c.gap}px`);
+  root.replaceChildren();
+  root.style.display = c.visible ? 'block' : 'none';
+  for (const [name, value] of Object.entries({color:c.color,alpha:Math.max(0,Math.min(100,Number(c.opacity)||0))/100,size:`${c.size}px`,length:`${c.length}px`,thickness:`${c.thickness}px`,gap:`${c.gap}px`,'offset-x':`${c.offsetX||0}px`,'offset-y':`${c.offsetY||0}px`})) root.style.setProperty(`--${name}`, value);
   root.className = `crosshair shape-${c.shape} ${c.outline ? 'outlined' : ''}`;
-  if (c.shape === 'dot') { const d = document.createElement('i'); d.className = 'dot'; root.append(d); }
-  else if (c.shape === 'circle') { const d = document.createElement('i'); d.className = 'ring'; root.append(d); if(c.dot){const dot=document.createElement('i');dot.className='dot';root.append(dot)} }
-  else { for(const side of ['top','right','bottom','left']) { const el=document.createElement('i');el.className=`arm ${side}`;root.append(el); } if(c.dot){const d=document.createElement('i');d.className='dot';root.append(d)} }
+  const add = (className) => { const el = document.createElement('i'); el.className = className; root.append(el); };
+  if (c.shape === 'dot') add('center-dot');
+  else if (c.shape === 'circle') { add('ring'); if (c.dot) add('center-dot'); }
+  else if (c.shape === 'cross') { add('diagonal d1'); add('diagonal d2'); if (c.dot) add('center-dot'); }
+  else { for (const side of ['top','right','bottom','left']) add(`arm a-${side}`); if (c.dot) add('center-dot'); }
 }
-if (window.aimxity) { window.aimxity.get().then(render); window.aimxity.onConfig(render); }
-else render({visible:true,shape:'classic',color:'#b8ff42',size:30,thickness:3,gap:7,opacity:100,dot:false,outline:true});
+if (window.aimxity) { window.aimxity.get().then(data => render(data.config || data)); window.aimxity.onConfig(render); }
+else render({visible:true,shape:'classic',color:'#b8ff42',size:30,length:30,thickness:3,gap:7,offsetX:0,offsetY:0,opacity:100,dot:false,outline:true});
